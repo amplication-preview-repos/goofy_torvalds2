@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Auction {
+  bids              Bid[]
+  car               Car?          @relation(fields: [carId], references: [id])
+  carId             String?
+  createdAt         DateTime      @default(now())
+  currentBid        Float?
+  endTime           DateTime?
+  highestBidder     String?
+  highestBidderUser String?
+  id                String        @id @default(cuid())
+  startTime         DateTime?
+  transactions      Transaction[]
+  updatedAt         DateTime      @updatedAt
+}
+
+model Car {
+  auctions    Auction[]
+  createdAt   DateTime  @default(now())
+  id          String    @id @default(cuid())
+  make        String?
+  mileage     Int?
+  model       String?
+  seller      String?
+  sellerUser  String?
+  startingBid Float?
+  updatedAt   DateTime  @updatedAt
+  year        Int?
+}
+
+model Bid {
+  amount     Float?
+  auction    Auction? @relation(fields: [auctionId], references: [id])
+  auctionId  String?
+  bidder     String?
+  bidderUser String?
+  createdAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  updatedAt  DateTime @updatedAt
+}
+
+model Transaction {
+  amount        Float?
+  auction       Auction? @relation(fields: [auctionId], references: [id])
+  auctionId     String?
+  buyer         String?
+  buyerUser     String?
+  createdAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  paymentMethod String?
+  paymentStatus String?
+  updatedAt     DateTime @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
